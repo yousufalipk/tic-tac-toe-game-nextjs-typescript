@@ -8,6 +8,7 @@ const Board: React.FC = () => {
     const [state, setState] = useState(Array(9).fill(null));
     const [player, setPlayer] = useState<string>('X');
     const [winner, setWinner] = useState<boolean>(false);
+    const [draw, setDraw] = useState<boolean>(false);
     
     const checkWinner = () => {
         const win = [
@@ -29,17 +30,39 @@ const Board: React.FC = () => {
         return false;
     }
 
+    const checkDraw = () => {
+        for(let i=0; i<8; i++){
+            if(state[i] === null){
+                return false
+            }
+        }
+        return true
+    }
+
     const handleBlockClick = (index: number) => {
+        // if block already filled!
         if(state[index]){
             toast.error("Already Marked!")
         }
         else{
+            // changing state to player name
             state[index] = player;
+
+            // Check win
             const win = checkWinner();
             if(win){
                 setWinner(true);
                 return
             }
+
+            // Check if drawn 
+            const draw = checkDraw();
+            if(draw){
+                setDraw(true);
+                return
+            }
+            
+            // Set next player turn
             setPlayer(player === 'X' ? 'O' : 'X')
         }
     }
@@ -48,6 +71,7 @@ const Board: React.FC = () => {
         setWinner(false);
         setPlayer('X');
         setState(Array(9).fill(null));
+        setDraw(false)
     }  
 
     if(winner){
@@ -57,6 +81,27 @@ const Board: React.FC = () => {
                     <div className='italic font-semibold text-5xl text-green-600 flex justify-center items-center mt-40'>
                         <h1>
                             Player {player} Wins!
+                        </h1>
+                    </div>
+
+                    <button
+                        onClick={handleReset}
+                        className='p-3 mt-10 w-1/2 rounded-lg bg-gray-200 text-center hover:bg-white hover:text-black hover:border-2 border-[black]'
+                    >
+                        Restart
+                    </button> 
+                </div>
+            </>
+        )
+    }
+
+    if(draw){
+        return (
+            <>
+                <div className='winner-banner flex flex-col justify-center items-center'> 
+                    <div className='italic font-semibold text-5xl text-green-600 flex justify-center items-center mt-40'>
+                        <h1>
+                            Match Draw!
                         </h1>
                     </div>
 
